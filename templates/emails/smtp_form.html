@@ -1,0 +1,41 @@
+{% extends 'base/base.html' %}
+{% load form_tags %} {# Required if using add_class filter #}
+{% block title %}{{ title }}{% endblock %}
+{% block header %}{{ title }}{% endblock %}
+
+{% block content %}
+
+<div class="card-body bg-light rounded-bottom-4">
+    <form method="post">
+        {% csrf_token %}
+
+        {% for field in form %}
+        <div class="mb-3">
+            {% if field.field.widget.input_type == "checkbox" %}
+            <div class="form-check">
+                {{ field|add_class:"form-check-input" }}
+                <label class="form-check-label fw-bold" for="{{ field.id_for_label }}">
+                    {{ field.label }}
+                </label>
+            </div>
+            {% else %}
+            <label class="form-label fw-bold" for="{{ field.id_for_label }}">{{ field.label }}</label>
+            {{ field|add_class:"form-control shadow-sm" }}
+            {% endif %}
+
+            {% if field.help_text %}
+            <small class="form-text text-muted">{{ field.help_text }}</small>
+            {% endif %}
+            {% for error in field.errors %}
+            <div class="text-danger small">{{ error }}</div>
+            {% endfor %}
+        </div>
+        {% endfor %}
+
+        <div class="d-flex justify-content-between mt-4">
+            <button type="submit" class="btn btn-success shadow-sm rounded-pill">💾 Save</button>
+            <a href="{% url 'smtp_list' %}" class="btn btn-secondary shadow-sm rounded-pill">❌ Cancel</a>
+        </div>
+    </form>
+</div>
+{% endblock %}
