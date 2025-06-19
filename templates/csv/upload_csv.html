@@ -1,0 +1,23 @@
+{% extends 'base/base.html' %}
+{% load form_tags %}
+{% block title %}Upload Files{% endblock %}
+{% block header %}Upload Files{% endblock %}
+
+{% block content %}
+<div class="container">
+    {% comment %} <h2>Upload CSV File</h2> {% endcomment %}
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="mb-3">
+            <label class="form-label">Name</label>
+            {{ form.name|add_class:"form-control" }}
+        </div>
+        <div class="mb-3">
+            <label class="form-label">CSV File</label>
+            {{ form.file|add_class:"form-control" }}
+        </div>
+        <button type="submit" class="btn btn-primary">Upload</button>
+    </form>
+    
+</div>
+{% endblock %}

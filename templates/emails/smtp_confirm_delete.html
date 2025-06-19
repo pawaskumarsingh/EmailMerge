@@ -1,0 +1,23 @@
+{% extends 'base/base.html' %}
+{% block title %}Delete SMTP Setting{% endblock %}
+{% block header %}🗑️ Confirm Delete{% endblock %}
+
+{% block content %}
+
+<div class="alert alert-danger shadow-sm border-danger-subtle rounded-3">
+    <h5 class="alert-heading">⚠️ Are you sure?</h5>
+    <p>You are about to delete <strong>{{ setting.email_address }}</strong>.</p>
+    <p class="mb-0 text-danger fw-bold">This action cannot be undone.</p>
+</div>
+
+<form method="post" class="mt-4 d-flex justify-content-between align-items-center">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-danger btn-lg shadow-sm rounded-pill">
+        ✅ Yes, Delete
+    </button>
+    <a href="{% url 'smtp_list' %}" class="btn btn-secondary btn-lg shadow-sm rounded-pill">
+        ❌ Cancel
+    </a>
+</form>
+
+{% endblock %}
