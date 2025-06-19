@@ -1,0 +1,56 @@
+{% extends 'base/base.html' %}
+{% block title %}SMTP Settings{% endblock %}
+{% block header %}📡 SMTP Settings{% endblock %}
+
+{% block content %}
+
+<div class="d-flex justify-content-end mb-3">
+    <a href="{% url 'smtp_create' %}" class="btn btn-outline-primary">
+        + Add SMTP
+    </a>
+</div>
+
+<div class="card-body bg-white rounded-bottom-4">
+    {% if settings %}
+    <div class="table-responsive">
+        <table class="table table-bordered table-hover align-middle shadow-sm">
+            <thead class="table-primary text-center">
+                <tr>
+                    <th>Email</th>
+                    <th>Host</th>
+                    <th>Port</th>
+                    <th>TLS</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for setting in settings %}
+                <tr>
+                    <td>{{ setting.email_address }}</td>
+                    <td>{{ setting.smtp_host }}</td>
+                    <td>{{ setting.port }}</td>
+                    <td>
+                        {% if setting.use_tls %}
+                        <span class="badge bg-success">Yes</span>
+                        {% else %}
+                        <span class="badge bg-secondary">No</span>
+                        {% endif %}
+                    </td>
+                    <td class="text-center">
+                        <a href="{% url 'smtp_detail' setting.pk %}" class="btn btn-sm btn-outline-info">👁 View</a>
+                        <a href="{% url 'smtp_update' setting.pk %}" class="btn btn-sm btn-outline-warning">✏️ Edit</a>
+                        <a href="{% url 'smtp_delete' setting.pk %}" class="btn btn-sm btn-outline-danger">🗑 Delete</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="alert alert-warning text-center">
+        No SMTP settings found. Click <strong>"Add SMTP"</strong> to create one.
+    </div>
+    {% endif %}
+</div>
+
+{% endblock %}
