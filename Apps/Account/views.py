@@ -40,5 +40,5 @@ class SignUpView(View):
         if form.is_valid():
             user = form.save()
             login(request, user)
-            return redirect('home')  # change this to your homepage or dashboard
+            return redirect('/')  # change this to your homepage or dashboard
         return render(request, self.template_name, {'form': form})
