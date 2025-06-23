@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'Apps.MailMerge',  # Custom app for email mail merge functionality
+    'Apps.Account',  # Custom app for user accounts and authentication
 ]
 
 MIDDLEWARE = [

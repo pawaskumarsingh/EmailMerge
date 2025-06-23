@@ -1,8 +1,10 @@
 from django.db import models
+from django.contrib.auth.models import User
 
 # Create your models here.
 
 class SMTPSetting(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True)
     smtp_host = models.CharField(max_length=255, null=False, blank=False)
     smtp_port = models.IntegerField(default=587)  # Default SMTP port is usually 587 for TLS
     use_tls = models.BooleanField(default=True, null=False, blank=False)

@@ -14,47 +14,63 @@ from smtplib import SMTPRecipientsRefused
 from django.template.loader import render_to_string
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
+def setting_obj(request):
+    if request.user.is_authenticated:
+        settings = SMTPSetting.objects.filter(is_active=True, user=request.user)
+    else:
+        settings = SMTPSetting.objects.none()  # Return an empty queryset
+    return settings
+
 
 class SMTPListView(View):
     def get(self, request):
-        settings = SMTPSetting.objects.all()
-        return render(request, 'emails/smtp_list.html', {'settings': settings, 'smtp_settings': SMTPSetting.objects.filter(is_active=True)})
+        settings = setting_obj(request)
+        return render(request, 'emails/smtp_list.html', {'settings': settings, 'smtp_settings':settings})
+
 
 class SMTPDetailView(View):
     def get(self, request, pk):
+        settings = setting_obj(request)
         setting = get_object_or_404(SMTPSetting, pk=pk)
-        return render(request, 'emails/smtp_detail.html', {'setting': setting,  'smtp_settings': SMTPSetting.objects.filter(is_active=True)})
+        return render(request, 'emails/smtp_detail.html', {'setting': setting,  'smtp_settings': settings})
 
 class SMTPCreateView(View):
     def get(self, request):
+        settings = setting_obj(request)
         form = SMTPSettingForm()
-        return render(request, 'emails/smtp_form.html', {'form': form, 'title': 'Add SMTP Setting',  'smtp_settings': SMTPSetting.objects.filter(is_active=True)})
+        return render(request, 'emails/smtp_form.html', {'form': form, 'title': 'Add SMTP Setting',  'smtp_settings': settings})
 
     def post(self, request):
+        settings = setting_obj(request)
         form = SMTPSettingForm(request.POST)
-        if form.is_valid():
+        if form.is_valid(commit=False):
+            form.instance.user = request.user
+            form.instance.is_active = True  # Default to active
             form.save()
             return redirect('smtp_list')
-        return render(request, 'emails/smtp_form.html', {'form': form, 'title': 'Add SMTP Setting', 'smtp_settings': SMTPSetting.objects.filter(is_active=True)})
+        return render(request, 'emails/smtp_form.html', {'form': form, 'title': 'Add SMTP Setting', 'smtp_settings': settings})
 
 class SMTPUpdateView(View):
     def get(self, request, pk):
+        settings = setting_obj(request)
         setting = get_object_or_404(SMTPSetting, pk=pk)
         form = SMTPSettingForm(instance=setting)
-        return render(request, 'emails/smtp_form.html', {'form': form, 'title': 'Edit SMTP Setting', 'smtp_settings': SMTPSetting.objects.filter(is_active=True)})
+        return render(request, 'emails/smtp_form.html', {'form': form, 'title': 'Edit SMTP Setting', 'smtp_settings': settings})
 
     def post(self, request, pk):
         setting = get_object_or_404(SMTPSetting, pk=pk)
+        settings = setting_obj(request)
         form = SMTPSettingForm(request.POST, instance=setting)
         if form.is_valid():
             form.save()
             return redirect('smtp_list')
-        return render(request, 'emails/smtp_form.html', {'form': form, 'title': 'Edit SMTP Setting'})
+        return render(request, 'emails/smtp_form.html', {'form': form, 'title': 'Edit SMTP Setting', 'smtp_settings': settings})
 
 class SMTPDeleteView(View):
     def get(self, request, pk):
+        settings = setting_obj(request)
         setting = get_object_or_404(SMTPSetting, pk=pk)
-        return render(request, 'emails/smtp_confirm_delete.html', {'setting': setting, 'smtp_settings': SMTPSetting.objects.filter(is_active=True) })
+        return render(request, 'emails/smtp_confirm_delete.html', {'setting': setting, 'smtp_settings': settings})
 
     def post(self, request, pk):
         setting = get_object_or_404(SMTPSetting, pk=pk)
@@ -160,6 +176,7 @@ class SendBulkEmailView(View):
     template_name = 'emails/send_bulk_email.html'
 
     def get(self, request, smtp_id=None):
+        settings = setting_obj(request)
         if smtp_id:
             try:
                 smtp_instance = SMTPSetting.objects.get(pk=smtp_id)
@@ -172,7 +189,7 @@ class SendBulkEmailView(View):
         return render(request, self.template_name, {
             'form': form,
             'smtp_instance':smtp_instance,
-            'smtp_settings': SMTPSetting.objects.filter(is_active=True)  # for sidebar if needed
+            'smtp_settings': settings  # for sidebar if needed
         })
 
     def post(self, request, smtp_id=None):
@@ -270,6 +287,7 @@ class SendBulkEmailView(View):
 
 
 def upload_csv(request):
+    settings = setting_obj(request)
     if request.method == 'POST':
         form = CSVUploadForm(request.POST, request.FILES)
         if form.is_valid():
@@ -277,4 +295,4 @@ def upload_csv(request):
             return redirect('csv_list')  # Or wherever you want to redirect
     else:
         form = CSVUploadForm()
-    return render(request, 'csv/upload_csv.html', {'form': form, 'smtp_settings': SMTPSetting.objects.filter(is_active=True) })
+    return render(request, 'csv/upload_csv.html', {'form': form, 'smtp_settings': settings})
