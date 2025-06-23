@@ -43,7 +43,8 @@ class SMTPCreateView(View):
     def post(self, request):
         settings = setting_obj(request)
         form = SMTPSettingForm(request.POST)
-        if form.is_valid(commit=False):
+        if form.is_valid():
+            form.save(commit=False)
             form.instance.user = request.user
             form.instance.is_active = True  # Default to active
             form.save()
