@@ -20,5 +20,5 @@ from django.urls import path, include
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('Apps.MailMerge.urls')),  # Include the MailMerge app URLs
-    path('accounts/', include('Apps.Account.urls')),  # Include the Account app URLs
+    path('', include('Apps.Account.urls')),  # Include the Account app URLs
 ]
